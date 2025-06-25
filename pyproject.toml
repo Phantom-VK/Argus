@@ -1,0 +1,22 @@
+[build-system]
+requires = ["setuptools", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "Argus"
+version = "1.0.0"
+description = "Automated screenshot and productivity tracker"
+readme = "README.md"
+requires-python = ">=3.8"
+license = {file = "LICENSE"}
+authors = [{name = "Vikramaditya Khupse", email = "vikramadityakhupse@gmail.com"}]
+classifiers = [
+    "Programming Language :: Python :: 3.13",
+    "Operating System :: OS Independent",
+]
+
+[project.urls]
+Homepage = "https://github.com/Phantom-VK/Argus.git"
+
+[project.scripts]
+argus = "argus.main:main"
