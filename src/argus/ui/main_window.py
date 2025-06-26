@@ -8,10 +8,12 @@ from src.argus.exceptions import CustomException
 from src.argus.mousetracking.clicktracker import ClickTracker
 from src.argus.screenshot.capture import ScreenshotCapture
 from src.argus.logger import logging
+from src.argus.timetracker.time_tracker import get_random_interval
+
 
 class AppUI:
     def __init__(self):
-        self.click_tracker = ClickTracker(inactivity_threshold=60)
+        self.click_tracker = ClickTracker(inactivity_threshold=120)
         self.click_tracker.callback = self._handle_inactivity
         self.capture = ScreenshotCapture(self.click_tracker)
         self.root = ctk.CTk()
@@ -85,18 +87,20 @@ class AppUI:
         self.user_entry.configure(state="normal")
         self.status_label.configure(text="Status: Stopped", text_color="#e74c3c")
 
-    def _handle_inactivity(self, activity:bool):
+    def _handle_inactivity(self, activity: bool):
         if activity:
             if self.capture.is_running and self.capture.is_paused:
                 self.toggle_pause()
         else:
-            self.toggle_pause()
+            # Only pause if not already paused
+            if self.capture.is_running and not self.capture.is_paused:
+                self.toggle_pause()
 
     def run_capture_loop(self):
         while self.capture.is_running:
             if not self.capture.is_paused:
-                random_time = self.capture.get_random_interval()
-                # print(f"Random time: {random_time}")
+                random_time = get_random_interval()
+                print(f"Random time: {random_time}")
                 time.sleep(random_time)
                 if self.capture.is_running:
                     success = self.capture.capture()
