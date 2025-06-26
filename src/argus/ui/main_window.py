@@ -96,15 +96,14 @@ class AppUI:
         while self.capture.is_running:
             if not self.capture.is_paused:
                 random_time = self.capture.get_random_interval()
-                print(f"Random time: {random_time}")
+                # print(f"Random time: {random_time}")
                 time.sleep(random_time)
                 if self.capture.is_running:
-                    filepath = self.capture.capture()
-                    if filepath:
-                        self.root.after(0, lambda: self.status_label.configure(
-                            text=f"Last: {filepath.split('/')[-1][:20]}...",
-                            text_color="#f39c12"
-                        ))
+                    success = self.capture.capture()
+                    self.root.after(0, lambda: self.status_label.configure(
+                        text=f"Last upload: {'Success' if success else 'Failed'}",
+                        text_color="#2ecc71" if success else "#e74c3c"
+                    ))
 
     def update_work_time(self):
         if self.capture.is_running:
