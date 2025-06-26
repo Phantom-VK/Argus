@@ -1,3 +1,4 @@
+from src.argus.logger import logging
 from datetime import datetime, timedelta
 
 
@@ -10,6 +11,7 @@ class TimeTracker:
 
     def start(self):
         """Start or resume tracking"""
+        logging.info("Time tracker started")
         if self.start_time is None:
             self.start_time = datetime.now()
         elif self.is_paused:
