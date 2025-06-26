@@ -33,8 +33,8 @@ class ActivityTrackerAPI:
                     data={
                         'employee_id': employee_id,
                         'time_between_screenshots_sec': work_seconds,
-                        'keyboard_clicks': 0,  # Placeholder
-                        'mouse_px_travel': 0,   # Placeholder
+                        'keyboard_clicks': "0",  # Placeholder
+                        'mouse_px_travel': "0",   # Placeholder
                     }
                 )
 
