@@ -39,3 +39,5 @@ class TimeTracker:
         hours, remainder = divmod(elapsed.seconds, 3600)
         minutes, seconds = divmod(remainder, 60)
         return f"{hours:02d}:{minutes:02d}:{seconds:02d}"
+    def get_time_in_sec(self):
+        return self.get_elapsed_time().total_seconds()
