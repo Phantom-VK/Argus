@@ -1,8 +1,6 @@
 import sys
 import platform
 
-import requests
-
 from src.argus.ui.main_window import AppUI
 from src.argus.exceptions import CustomException
 from src.argus.logger import logging
