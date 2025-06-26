@@ -5,7 +5,7 @@ import random
 import sys
 from datetime import datetime
 import mss
-
+import mss.tools
 from src.argus.exceptions import CustomException
 from src.argus.mousetracking.clicktracker import ClickTracker
 from src.argus.timetracker.time_tracker import TimeTracker
@@ -63,7 +63,19 @@ class ScreenshotCapture:
 
         try:
             with mss.mss() as sct:
-                sct.shot(output=filepath)
+                monitor_areas = [sct.monitors[i] for i in range(1, len(sct.monitors))]
+                left = min(m["left"] for m in monitor_areas)
+                top = min(m["top"] for m in monitor_areas)
+                right = max(m["left"] + m["width"] for m in monitor_areas)
+                bottom = max(m["top"] + m["height"] for m in monitor_areas)
+                # Capture the entire virtual screen
+                screenshot = sct.grab({
+                    "left": left,
+                    "top": top,
+                    "width": right - left,
+                    "height": bottom - top
+                })
+                mss.tools.to_png(screenshot.rgb, screenshot.size, output=filepath)
                 logging.info(f"Screenshot captured! Path: {filepath}")
             return filepath
         except Exception as e:

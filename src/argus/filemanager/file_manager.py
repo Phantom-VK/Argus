@@ -37,7 +37,7 @@ class FileManager:
 
     def get_screenshot_path(self, user_id: str) -> str:
         """Get dated screenshot path for today"""
-        today = datetime.now().strftime("%Y-%m-%d")
+        today = datetime.now().strftime("%Y-%m-%d-%H")
         return self.get_path("screenshots", user_id, today)
 
     def get_log_path(self) -> str:
