@@ -1,14 +1,19 @@
+import sys
 import time
 
 import customtkinter as ctk
 import threading
 
+from src.argus.exceptions import CustomException
+from src.argus.mousetracking.clicktracker import ClickTracker
 from src.argus.screenshot.capture import ScreenshotCapture
-
+from src.argus.logger import logging
 
 class AppUI:
     def __init__(self):
-        self.capture = ScreenshotCapture()
+        self.click_tracker = ClickTracker(inactivity_threshold=60)
+        self.click_tracker.callback = self._handle_inactivity
+        self.capture = ScreenshotCapture(self.click_tracker)
         self.root = ctk.CTk()
         self.root.title("Argus Screenshot Tracker")
         self.root.geometry("400x250")
@@ -56,6 +61,9 @@ class AppUI:
         self.user_entry.configure(state="disabled")
         self.status_label.configure(text="Status: Running", text_color="#2ecc71")
 
+        #Capture Initial shot
+        self.capture.capture()
+
         threading.Thread(target=self.run_capture_loop, daemon=True).start()
         self.update_work_time()
 
@@ -77,11 +85,20 @@ class AppUI:
         self.user_entry.configure(state="normal")
         self.status_label.configure(text="Status: Stopped", text_color="#e74c3c")
 
+    def _handle_inactivity(self, activity:bool):
+        if activity:
+            if self.capture.is_running and self.capture.is_paused:
+                self.toggle_pause()
+        else:
+            self.toggle_pause()
+
     def run_capture_loop(self):
         while self.capture.is_running:
             if not self.capture.is_paused:
-                time.sleep(self.capture.get_random_interval())
-                if self.capture.is_running and not self.capture.is_paused:
+                random_time = self.capture.get_random_interval()
+                print(f"Random time: {random_time}")
+                time.sleep(random_time)
+                if self.capture.is_running:
                     filepath = self.capture.capture()
                     if filepath:
                         self.root.after(0, lambda: self.status_label.configure(
@@ -91,8 +108,15 @@ class AppUI:
 
     def update_work_time(self):
         if self.capture.is_running:
-            self.time_label.configure(text=f"Work time: {self.capture.get_work_hours()}")
+            working_hours = self.capture.get_work_hours()
+            self.time_label.configure(text=f"Work time: {working_hours}")
             self.root.after(1000, self.update_work_time)
 
+
+
     def run(self):
-        self.root.mainloop()
+        try:
+            self.root.mainloop()
+            logging.info("Inside mainloop")
+        except Exception as e:
+            raise CustomException(e, sys)
