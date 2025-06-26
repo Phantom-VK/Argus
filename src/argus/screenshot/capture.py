@@ -6,7 +6,6 @@ import sys
 from datetime import datetime
 import mss
 
-from project_config import PROJECT_ROOT
 from src.argus.exceptions import CustomException
 from src.argus.mousetracking.clicktracker import ClickTracker
 from src.argus.timetracker.time_tracker import TimeTracker
