@@ -1,3 +1,5 @@
+import random
+
 from src.argus.logger import logging
 from datetime import datetime, timedelta
 
@@ -39,5 +41,16 @@ class TimeTracker:
         hours, remainder = divmod(elapsed.seconds, 3600)
         minutes, seconds = divmod(remainder, 60)
         return f"{hours:02d}:{minutes:02d}:{seconds:02d}"
-    def get_time_in_sec(self):
-        return self.get_elapsed_time().total_seconds()
+
+    def get_time_in_sec(self) -> str:
+        return str(self.get_elapsed_time().total_seconds())
+
+    def get_paused_duration_since(self, since_time: datetime) -> timedelta:
+        """Calculate total paused duration since given timestamp"""
+        if not self.last_pause_time or since_time > self.last_pause_time:
+            return timedelta()
+        return datetime.now() - self.last_pause_time
+
+
+def get_random_interval() -> int:
+    return random.randint(120, 180)
