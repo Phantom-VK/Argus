@@ -1,3 +1,4 @@
+from src.argus.Api.api_client import api_client
 from src.argus.filemanager.file_manager import file_manager
 from src.argus.logger import logging
 import os
@@ -53,9 +54,9 @@ class ScreenshotCapture:
     def get_random_interval(self) -> int:
         return random.randint(120, 240)  # 2-4 minutes
 
-    def capture(self) -> str:
+    def capture(self) -> bool:
         if not self.is_running or self.is_paused:
-            return ""
+            return False
 
         timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
         filename = f"screenshot_{timestamp}.png"
@@ -77,9 +78,19 @@ class ScreenshotCapture:
                 })
                 mss.tools.to_png(screenshot.rgb, screenshot.size, output=filepath)
                 logging.info(f"Screenshot captured! Path: {filepath}")
-            return filepath
+
+                #Prepare upload
+                work_seconds = self.time_tracker.get_time_in_sec()
+                success = api_client.upload_activity(
+                    employee_id=self.user_id,
+                    screenshot_path=filepath,
+                    work_seconds=work_seconds
+                )
+
+            return success
         except Exception as e:
             raise CustomException(e, sys)
+
 
     def get_work_hours(self) -> str:
         return self.time_tracker.get_formatted_time()

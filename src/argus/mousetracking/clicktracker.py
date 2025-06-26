@@ -28,7 +28,7 @@ class ClickTracker:
     def _monitor_inactivity(self):
         while self.monitor_activity:
             time_since_last_click = (datetime.now() - self.last_click_time).total_seconds()
-            logging.info(f"TIme since last click {time_since_last_click}")
+            logging.info(f"Time since last click {time_since_last_click}")
             if time_since_last_click > self.inactivity_threshold and self.callback:
                 self.callback(activity = False)  # Notify of inactivity
             threading.Event().wait(10)  # Check every 10 seconds

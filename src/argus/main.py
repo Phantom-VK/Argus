@@ -1,8 +1,12 @@
 import sys
 import platform
+
+import requests
+
 from src.argus.ui.main_window import AppUI
 from src.argus.exceptions import CustomException
 from src.argus.logger import logging
+
 
 
 def handle_exception(exc_type, exc_value, exc_traceback):
