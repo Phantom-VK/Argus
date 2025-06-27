@@ -5,7 +5,7 @@ from datetime import datetime, timedelta
 import mss
 import mss.tools
 
-from src.argus.Api.api_client import api_client
+from src.argus.api.api_client import api_client
 from src.argus.exceptions import CustomException
 from src.argus.filemanager.file_manager import file_manager
 from src.argus.logger import logging
