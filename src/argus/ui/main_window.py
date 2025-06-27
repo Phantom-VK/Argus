@@ -11,7 +11,7 @@ from src.argus.logger import logging
 from src.argus.timetracker.time_tracker import get_random_interval
 
 
-class AppUI:
+class MainAppUI:
     def __init__(self):
         self.click_tracker = ClickTracker(inactivity_threshold=120)
         self.click_tracker.callback = self._handle_inactivity

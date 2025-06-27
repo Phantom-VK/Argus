@@ -1,7 +1,8 @@
 import sys
 import platform
 
-from src.argus.ui.main_window import AppUI
+from src.argus.ui.auth_window import AuthAppUI
+from src.argus.ui.main_window import MainAppUI
 from src.argus.exceptions import CustomException
 from src.argus.logger import logging
 
@@ -56,7 +57,8 @@ def main():
         check_platform()
 
         # Initialize and run application
-        app = AppUI()
+        # app = MainAppUI()
+        app  = AuthAppUI()
         app.run()
 
     except Exception as e:
