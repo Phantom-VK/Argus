@@ -58,6 +58,7 @@ class ScreenshotCapture:
         self.click_tracker.stop_monitoring()
 
         # Reset all timers
+        self.time_tracker.reset_all_time()
         self.last_capture_time = None
 
     def capture(self) -> bool:

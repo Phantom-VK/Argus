@@ -4,7 +4,7 @@ import customtkinter as ctk
 
 from src.argus.api.auth import AuthAPI
 from src.argus.exceptions import CustomException
-from src.argus.utils.utils import open_main_window
+from src.argus.ui.main_window import MainAppUI
 
 
 class RegisterWindow(ctk.CTkToplevel):
@@ -86,17 +86,23 @@ class RegisterWindow(ctk.CTkToplevel):
 
             if response.get("success"):
                 self.status_label.configure(text="Registration successful!", text_color="green")
-                self.after(1000, lambda: self.safe_destroy_and_open_main(login_id, username))
+                user_id_num = response.get("id")
+                self.after(1000, lambda: self.safe_destroy_and_open_main(user_id_num, username))
             else:
                 raise CustomException(response.get("message", "Registration failed."))
 
         except CustomException as e:
             self.status_label.configure(text=str(e), text_color="red")
 
-    def safe_destroy_and_open_main(self, user_id, username):
+    def safe_destroy_and_open_main(self, user_id_num, username):
         if self.winfo_exists():
             self.destroy()
-            open_main_window(user_id=user_id, user_name=username)
+            self.parent.destroy()
+            self.open_main_window(user_id_num=user_id_num, user_name=username)
+
+    def open_main_window(self, user_id_num, user_name):
+        app = MainAppUI(user_id_num=str(user_id_num), username=user_name)
+        app.run()
 
     def _validate_registration_fields(self, username, email, mobile, login_id, password):
         if not all([username.strip(), email.strip(), mobile.strip(), login_id.strip(), password.strip()]):

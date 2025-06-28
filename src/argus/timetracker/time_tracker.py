@@ -1,5 +1,3 @@
-import random
-
 from src.argus.logger import logging
 from datetime import datetime, timedelta
 
@@ -26,6 +24,13 @@ class TimeTracker:
             self.last_pause_time = datetime.now()
             self.is_paused = True
 
+    def reset_all_time(self):
+        self.start_time = None
+        self.total_paused_time = timedelta()
+        self.last_pause_time = None
+        self.is_paused = False
+
+
     def get_elapsed_time(self) -> timedelta:
         """Get actual worked time (excluding paused time)"""
         if not self.start_time:
@@ -50,7 +55,3 @@ class TimeTracker:
         if not self.last_pause_time or since_time > self.last_pause_time:
             return timedelta()
         return datetime.now() - self.last_pause_time
-
-
-def get_random_interval() -> int:
-    return random.randint(120, 180)
