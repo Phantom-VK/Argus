@@ -4,9 +4,10 @@ import customtkinter as ctk
 from src.argus.api.auth import AuthAPI
 from src.argus.exceptions import CustomException
 from src.argus.ui.register_window import RegisterWindow
+from src.argus.utils.utils import open_main_window
 
 
-class AuthAppUI:
+class LoginAppUI:
     def __init__(self):
         self.root = ctk.CTk()
         self.root.title("Argus Authentication")
@@ -48,7 +49,9 @@ class AuthAppUI:
             )
             if response["success"]:
                 self.status_label.configure(text="Login Successful!")
-                self.quit()
+                username = response.get("employee", {}).get("name")
+                user_id_num = response.get("employee", {}).get("id")
+                self.root.after(1000, lambda: self.safe_destroy_and_open_main(user_id_num, username))
                 return response["employee"]
             else:
                 self.status_label.configure(text="Failed to login, check your details.")
@@ -56,6 +59,11 @@ class AuthAppUI:
         except Exception as e:
             self.status_label.configure(text=str(e))
             raise CustomException(e, sys)
+
+    def safe_destroy_and_open_main(self, user_id_num, username):
+        if self.root.winfo_exists():
+            self.root.destroy()
+            open_main_window(user_id_num=user_id_num, user_name=username)
 
     def show_register_window(self):
         # Simple registration with minimal fields

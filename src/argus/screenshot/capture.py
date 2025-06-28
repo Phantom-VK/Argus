@@ -56,6 +56,8 @@ class ScreenshotCapture:
         logging.info("App stopped!")
         logging.info(f"Total work hours: {self.get_work_hours()}")
         self.click_tracker.stop_monitoring()
+
+        # Reset all timers
         self.last_capture_time = None
 
     def capture(self) -> bool:

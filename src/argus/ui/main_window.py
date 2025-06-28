@@ -12,11 +12,13 @@ from src.argus.timetracker.time_tracker import get_random_interval
 
 
 class MainAppUI:
-    def __init__(self):
+    def __init__(self, user_id_num:str, username:str):
         self.click_tracker = ClickTracker(inactivity_threshold=120)
         self.click_tracker.callback = self._handle_inactivity
         self.capture = ScreenshotCapture(self.click_tracker)
         self.root = ctk.CTk()
+        self.user_id_num = user_id_num
+        self.user_name = username
         self.root.title("Argus Screenshot Tracker")
         self.root.geometry("400x250")
         ctk.set_appearance_mode("dark")
@@ -24,8 +26,8 @@ class MainAppUI:
 
     def create_widgets(self):
         # User ID Entry
-        self.user_entry = ctk.CTkEntry(self.root, placeholder_text="Enter your user ID", width=250)
-        self.user_entry.pack(pady=10)
+        self.userid_label = ctk.CTkLabel(self.root, text=f"Current user: {self.user_name} id: {self.user_id_num}", text_color="#3498db")
+        self.userid_label.pack(pady=5)
 
         # Button Frame
         self.button_frame = ctk.CTkFrame(self.root, fg_color="transparent")
@@ -51,16 +53,15 @@ class MainAppUI:
         self.time_label.pack()
 
     def start_capture(self):
-        user_id = self.user_entry.get().strip()
-        if not user_id:
-            self.status_label.configure(text="Please enter user ID!", text_color="#e74c3c")
+        if not self.user_id_num:
+            self.status_label.configure(text="User id not found, log in again!", text_color="#e74c3c")
+            self.root.after(1000, lambda : self.root.quit())
             return
 
-        self.capture.start(user_id)
+        self.capture.start(self.user_id_num)
         self.start_btn.configure(state="disabled")
         self.pause_btn.configure(state="normal")
         self.stop_btn.configure(state="normal")
-        self.user_entry.configure(state="disabled")
         self.status_label.configure(text="Status: Running", text_color="#2ecc71")
 
         #Capture Initial shot
@@ -71,10 +72,15 @@ class MainAppUI:
 
     def toggle_pause(self):
         if self.capture.is_paused:
+            self.click_tracker.ignore_ui_clicks(2)
+            self.click_tracker.reset_inactivity_timer()
+
             self.capture.resume()
             self.pause_btn.configure(text="Pause")
             self.status_label.configure(text="Status: Running", text_color="#2ecc71")
         else:
+            self.click_tracker.ignore_ui_clicks(2)
+
             self.capture.pause()
             self.pause_btn.configure(text="Resume")
             self.status_label.configure(text="Status: Paused", text_color="#f39c12")
@@ -84,17 +90,27 @@ class MainAppUI:
         self.start_btn.configure(state="normal")
         self.pause_btn.configure(state="disabled")
         self.stop_btn.configure(state="disabled")
-        self.user_entry.configure(state="normal")
         self.status_label.configure(text="Status: Stopped", text_color="#e74c3c")
 
     def _handle_inactivity(self, activity: bool):
+        print(f"_handle_inactivity called with activity={activity}")
+
         if activity:
+            # Only auto-resume if currently paused due to inactivity
             if self.capture.is_running and self.capture.is_paused:
-                self.toggle_pause()
+                print("Auto-resuming due to mouse activity")
+                # Don't call toggle_pause, directly resume to avoid callback loop
+                self.capture.resume()
+                self.pause_btn.configure(text="Pause")
+                self.status_label.configure(text="Status: Running (Auto-resumed)", text_color="#2ecc71")
         else:
-            # Only pause if not already paused
+            # Only auto-pause if not already paused
             if self.capture.is_running and not self.capture.is_paused:
-                self.toggle_pause()
+                print("Auto-pausing due to inactivity")
+                # Don't call toggle_pause, directly pause to avoid callback loop
+                self.capture.pause()
+                self.pause_btn.configure(text="Resume")
+                self.status_label.configure(text="Status: Paused (Inactive)", text_color="#f39c12")
 
     def run_capture_loop(self):
         while self.capture.is_running:
