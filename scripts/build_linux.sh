@@ -12,8 +12,8 @@ pip3 install -r requirements.txt
 # Build
 pyinstaller \
     --onefile \
-    --name argus \
+    --name Argus \
     --add-data "src/argus/assets:assets" \
     src/argus/main.py
 
-echo "Build complete: dist/argus"
+echo "Build complete: dist/Argus"
