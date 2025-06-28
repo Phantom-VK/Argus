@@ -1,0 +1,63 @@
+name: Build and Release App
+
+on:
+  push:
+    branches:
+      - main
+    tags:
+      - 'v*'   # Only if you want to build on version tags like v1.0
+
+jobs:
+  build-linux:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v3
+
+      - name: Give execute permission
+        run: chmod +x ./scripts/build_linux.sh
+
+      - name: Build on Linux
+        run: ./scripts/build_linux.sh
+
+      - name: Upload Linux binary to release
+        uses: softprops/action-gh-release@v1
+        with:
+          files: ./dist/Argus  # Adjust path
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+  build-mac:
+    runs-on: macos-latest
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v3
+
+      - name: Give execute permission
+        run: chmod +x ./scripts/build_mac.sh
+
+      - name: Build on macOS
+        run: ./scripts/build_mac.sh
+
+      - name: Upload macOS binary to release
+        uses: softprops/action-gh-release@v1
+        with:
+          files: ./dist/Argus  # Adjust path
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+  build-windows:
+    runs-on: windows-latest
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v3
+
+      - name: Build on Windows
+        run: ./scripts/build_windows.bat
+
+      - name: Upload Windows binary to release
+        uses: softprops/action-gh-release@v1
+        with:
+          files: ./dist/Argus.exe  # Adjust path
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
