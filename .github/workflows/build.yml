@@ -1,4 +1,4 @@
-name: Build and Release App
+name: Build and Release Argus
 
 on:
   push:
@@ -9,46 +9,72 @@ on:
 
 jobs:
   build-linux:
+    name: Build on Ubuntu
     runs-on: ubuntu-latest
+
     steps:
-      - name: Checkout repo
+      - name: Checkout Code
         uses: actions/checkout@v3
 
-      - name: Give execute permission
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.13'
+
+      - name: Install Dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+          pip install pyinstaller
+
+      - name: Make Linux Build Script Executable
         run: chmod +x ./scripts/build_linux.sh
 
-      - name: Build on Linux
+      - name: Run Linux Build Script
         run: ./scripts/build_linux.sh
 
-      - name: List build output
+      - name: Check Built Files
         run: ls -R ./dist
 
-      - name: Upload Linux binary to release
+      - name: Upload Linux Binary to GitHub Release
         uses: softprops/action-gh-release@v1
         with:
-          files: ./dist/Argus  # Adjust path
+          files: ./dist/Argus
         env:
           GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
 
-  build-mac:
+  build-macos:
+    name: Build on macOS
     runs-on: macos-latest
+
     steps:
-      - name: Checkout repo
+      - name: Checkout Code
         uses: actions/checkout@v3
 
-      - name: Give execute permission
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.13'
+
+      - name: Install Dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+          pip install pyinstaller
+
+      - name: Make macOS Build Script Executable
         run: chmod +x ./scripts/build_mac.sh
 
-      - name: Build on macOS
+      - name: Run macOS Build Script
         run: ./scripts/build_mac.sh
 
-      - name: List build output
+      - name: Check Built Files
         run: ls -R ./dist
 
-      - name: Upload macOS binary to release
+      - name: Upload macOS Binary to GitHub Release
         uses: softprops/action-gh-release@v1
         with:
-          files: ./dist/Argus  # Adjust path
+          files: ./dist/Argus
         env:
           GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
 
@@ -59,7 +85,7 @@ jobs:
         uses: actions/checkout@v3
 
       - name: Build on Windows
-        run: ./scripts/build_windows.bat
+        run: ./scripts/build_win.bat
 
       - name: List build output
         run: ls -R ./dist
