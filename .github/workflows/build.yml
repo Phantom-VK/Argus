@@ -5,7 +5,7 @@ on:
     branches:
       - master
     tags:
-      - 'v*'   # Only if you want to build on version tags like v1.0
+      - 'v*'
 
 jobs:
   build-linux:
@@ -20,12 +20,15 @@ jobs:
       - name: Build on Linux
         run: ./scripts/build_linux.sh
 
+      - name: List build output
+        run: ls -R ./dist
+
       - name: Upload Linux binary to release
         uses: softprops/action-gh-release@v1
         with:
           files: ./dist/Argus  # Adjust path
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
 
   build-mac:
     runs-on: macos-latest
@@ -39,12 +42,15 @@ jobs:
       - name: Build on macOS
         run: ./scripts/build_mac.sh
 
+      - name: List build output
+        run: ls -R ./dist
+
       - name: Upload macOS binary to release
         uses: softprops/action-gh-release@v1
         with:
           files: ./dist/Argus  # Adjust path
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
 
   build-windows:
     runs-on: windows-latest
@@ -55,9 +61,12 @@ jobs:
       - name: Build on Windows
         run: ./scripts/build_windows.bat
 
+      - name: List build output
+        run: ls -R ./dist
+
       - name: Upload Windows binary to release
         uses: softprops/action-gh-release@v1
         with:
           files: ./dist/Argus.exe  # Adjust path
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
