@@ -3,7 +3,7 @@ name: Build and Release App
 on:
   push:
     branches:
-      - main
+      - master
     tags:
       - 'v*'   # Only if you want to build on version tags like v1.0
 
