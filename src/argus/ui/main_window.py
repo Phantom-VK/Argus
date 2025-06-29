@@ -150,8 +150,9 @@ class MainAppUI:
         # Show initial connection warning
         show_temp_dialog(
             self.root,
+            "Notice",
             "⚠ Ensure stable internet connection\nOtherwise your progress will be lost.",
-            3000
+            duration=4000
         )
 
     def _create_header_section(self, parent):
@@ -285,7 +286,11 @@ class MainAppUI:
     def _safe_start_capture(self):
         """Safely start capture with error handling"""
         try:
-            self.start_capture()
+            if has_internet_connection():
+                self.start_capture()
+            else:
+                self.is_internet_connected = False
+                show_temp_dialog(self.root, "Notice", message="Please check your internet connection and try again", duration=3500)
         except Exception as e:
             self._handle_error("Start Capture", e)
 
@@ -305,6 +310,7 @@ class MainAppUI:
 
     def start_capture(self):
         """Start capture with enhanced validation and UI updates"""
+
         if not self.user_id_num:
             self._show_error("User ID not found. Please log in again!")
             self.root.after(2000, self.root.quit)
@@ -451,7 +457,7 @@ class MainAppUI:
                 # Update progress bar (assuming 8-hour workday)
                 if hasattr(self.capture, 'get_elapsed_time'):
                     elapsed_seconds = self.capture.get_elapsed_time().total_seconds()
-                    progress = min(elapsed_seconds / (8 * 3600), 1.0)  # 8 hours max
+                    progress = min(elapsed_seconds / (9 * 3600), 1.0)  # 8 hours max
                     self.progress_bar.update_progress(progress)
 
                 self.root.after(1000, self._update_work_time)
@@ -464,6 +470,12 @@ class MainAppUI:
         """Enhanced internet checking with better UI feedback"""
         try:
             self.is_internet_connected = has_internet_connection()
+
+            if self.is_internet_connected and self.capture.is_running:
+                try:
+                    self.capture._upload_pending_screenshots()
+                except Exception as e:
+                    logging.warning(f"Error uploading pending screenshots: {e}")
             self.last_internet_check = datetime.now()
 
             if self.is_internet_connected:
@@ -485,7 +497,7 @@ class MainAppUI:
             )
 
         # Schedule next check
-        self.root.after(10000, self._check_internet_periodically)
+        self.root.after(4000, self._check_internet_periodically)
 
     def _start_background_tasks(self):
         """Start all background tasks"""

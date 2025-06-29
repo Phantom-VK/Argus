@@ -3,7 +3,7 @@ import socket
 import customtkinter as ctk
 
 def get_random_interval() -> int:
-    return random.randint(120, 180)
+    return random.randint(60, 120)
 
 
 
@@ -17,18 +17,30 @@ def has_internet_connection(timeout=3) -> bool:
 
 
 
-def show_temp_dialog(parent, title:str = "Notice" , message="Processing...", duration=2000):
-    dialog = ctk.CTkToplevel(parent)
-    dialog.title(title)
-    dialog.geometry("300x100")
-    dialog.transient(parent)  # Stay on top of parent
-    dialog.grab_set()         # Modal behavior
+def show_temp_dialog(parent, title: str = "Notice", message="Processing...", duration=2000):
+    def _show():
+        dialog = ctk.CTkToplevel(parent)
+        dialog.title(title)
+        dialog.geometry("320x120")
+        dialog.transient(parent)
 
-    label = ctk.CTkLabel(dialog, text=message)
-    label.pack(pady=20)
+        label = ctk.CTkLabel(
+            dialog,
+            text=message,
+            font=ctk.CTkFont(size=14),
+            wraplength=280,
+            justify="center",
+            text_color="white"
+        )
+        label.pack(pady=20, padx=20, fill="both", expand=True)
 
-    # Auto-close after specified milliseconds
-    dialog.after(duration, dialog.destroy)
+        # Wait for dialog to be visible, then grab
+        dialog.after(10, lambda: dialog.grab_set())
+        dialog.after(duration, dialog.destroy)
+
+    # Small delay to let main window settle
+    parent.after(100, _show)
+
 
 def ask_yes_no_dialog(parent, title="Confirmation", message="Are you sure?") -> bool:
     result = {"value": None}
